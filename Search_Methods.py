@@ -109,23 +109,36 @@ def bfs(graph, start, goal):
 
     return None
 
+# Depth First Search 
+def dfs_search(graph, start, goal, path =None, visited = None):
+    if path is None:
+        path = [start]
+    if visited is None:
+        visited = set()
+
+    visited.add(start)
+
+    if start == goal:
+        return path
+    
+    for neighbor in graph.adjacency_list.get(start, []):
+        if neighbor not in visited:
+            new_path = path + [neighbor]
+            result = dfs_search(graph, neighbor, goal, new_path, visited)
+            if result:
+                return result
+            
+    return None
+
 print('------------------------------------------------------------------------------------------------------------------')
-# Test Brute-Force and BFS
-start_city = 'Anthony'
-goal_city = 'Wichita'
+def get_search_method():
+    print("\nChoose a search method:")
+    print("1. Brute Force Search")
+    print("2. Breadth First Search")
+    print("3. Depth First Search")
+    print("4. Iterative Deepening Depth First Search")
+    print("5. Best First Search")
+    print("6. A* Search")
 
-# Brute-Force Search
-print("\nBrute-Force Search Result:")
-brute_force_result = brute_force_search(graph, start_city, goal_city)
-if brute_force_result:
-    print(f"Route found: {brute_force_result}")
-else:
-    print("No route found.")
+    choice = input("Enter the number of your choice (1-6)")
 
-# Breadth-First Search
-print("\nBreadth-First Search Result:")
-bfs_result = bfs(graph, start_city, goal_city)
-if bfs_result:
-    print(f"Route found: {bfs_result}")
-else:
-    print("No route found.")
