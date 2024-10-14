@@ -1,4 +1,6 @@
 import csv
+import math
+import heapq
 
 #Function to load coordinates csv file
 def coordinates(filename = 'coordinates.csv'):
@@ -130,6 +132,75 @@ def dfs_search(graph, start, goal, path =None, visited = None):
             
     return None
 
+def iddfs_search(graph, start, goal, max_depth=1000):
+    def dls(current, goal, depth, path):
+        if depth == 0 and current == goal:
+            return path
+        if depth > 0:
+            for neighbor in graph.adjacency_list.get(current, []):
+                if neighbor not in path:
+                    result = dls(neighbor, goal, depth - 1, path + [neighbor])
+                    if result:
+                        return result
+        return None
+
+    # Iteratively deepening DFS
+    for depth in range(max_depth):
+        result = dls(start, goal, depth, [start])
+        if result:
+            return result
+    return None
+
+def heuristic(city1, city2, coordinates):
+    lat1, lon1 = coordinates[city1]
+    lat2, lon2 = coordinates[city2]
+    return math.sqrt((lat1 - lat2)**2 + (lon1 - lon2)**2)
+
+def best_first_search(graph, start, goal, coordinates):
+    open_list = []
+    heapq.heappush(open_list, (0, [start]))  # (heuristic value, path)
+    visited = set()
+
+    while open_list:
+        _, path = heapq.heappop(open_list)
+        current = path[-1]
+
+        if current == goal:
+            return path
+
+        if current not in visited:
+            visited.add(current)
+            for neighbor in graph.adjacency_list.get(current, []):
+                if neighbor not in visited:
+                    new_path = path + [neighbor]
+                    priority = heuristic(neighbor, goal, coordinates)
+                    heapq.heappush(open_list, (priority, new_path))
+
+    return None
+
+def a_star_search(graph, start, goal, coordinates):
+    open_list = []
+    heapq.heappush(open_list, (0, [start], 0))  # (f(n), path, g(n))
+    visited = set()
+
+    while open_list:
+        _, path, g = heapq.heappop(open_list)
+        current = path[-1]
+
+        if current == goal:
+            return path
+
+        if current not in visited:
+            visited.add(current)
+            for neighbor in graph.adjacency_list.get(current, []):
+                if neighbor not in visited:
+                    new_path = path + [neighbor]
+                    g_new = g + heuristic(current, neighbor, coordinates)  # g(n)
+                    f = g_new + heuristic(neighbor, goal, coordinates)  # f(n) = g(n) + h(n)
+                    heapq.heappush(open_list, (f, new_path, g_new))
+
+    return None
+
 print('------------------------------------------------------------------------------------------------------------------')
 def get_search_method():
     print("\nChoose a search method:")
@@ -140,5 +211,49 @@ def get_search_method():
     print("5. Best First Search")
     print("6. A* Search")
 
-    choice = input("Enter the number of your choice (1-6)")
+    choice = input("Enter the number of your choice (1-6): ")
 
+    if choice.isdigit() and int(choice) in {1, 2, 3, 4, 5, 6}:
+        return int(choice)
+    else:
+        print("Invalid input. Please try again.")
+        return get_search_method()
+
+def run_search(graph, start_city, goal_city):
+    choice = get_search_method()
+
+    if choice == 1:
+        print("/nRunning Brute Force Search..")
+        result = brute_force_search(graph, start_city, goal_city)
+    elif choice == 2:
+        print("/nRunning Breadth First Search..")
+        result = bfs(graph, start_city, goal_city)
+    elif choice == 3:
+        print("/nRunning Depth First Search..")
+        result = dfs_search(graph, start_city, goal_city)
+    elif choice == 4:
+        print("/nRunning Iterative Deepening Depth First Seartch..")
+        result = iddfs_search(graph, start_city, goal_city)
+    elif choice == 5:
+        print("/nRunning Best First Search..")
+        result = best_first_search(graph, start_city, goal_city)
+    elif choice == 6:
+        print("/nRunning A* Search..")
+        result = a_star_search(graph, start_city, goal_city)
+
+    if result:
+        print(f"Route found: {result}")
+    else:
+        print("No route found.")
+        return run_search
+
+# Main program to run the search
+if __name__ == "__main__":
+    # Example of how to call the run_search function:
+    start_city = input("Enter the start city: ")
+    goal_city = input("Enter the goal city: ")
+
+    if start_city in coordinates and goal_city in coordinates:
+        run_search(graph, start_city, goal_city)
+    else:
+        print("One or both cities not found in the data.")
