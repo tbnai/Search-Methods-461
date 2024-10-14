@@ -37,6 +37,8 @@ def adjacencies(filename = 'adjacencies.txt'):
 coordinates = coordinates()
 adjacencies = adjacencies()
 
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
 class Graph:
     def __init__(self):
         self.adjacency_list = {}
@@ -64,6 +66,7 @@ for city, neighbors in adjacencies.items():
 print("Graph of cities and their adjacencies:")
 graph.display_graph()
 
+#--------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Brute-Force search
 def brute_force_search(graph, start, goal, path = []):
