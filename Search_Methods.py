@@ -67,6 +67,7 @@ print("Graph of cities and their adjacencies:")
 graph.display_graph()
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------
+# Search Algorithms
 
 # Brute-Force search
 def brute_force_search(graph, start, goal, path = []):
@@ -135,6 +136,7 @@ def dfs_search(graph, start, goal, path =None, visited = None):
             
     return None
 
+# Iterative Deepening DFS
 def iddfs_search(graph, start, goal, max_depth=1000):
     def dls(current, goal, depth, path):
         if depth == 0 and current == goal:
@@ -147,17 +149,11 @@ def iddfs_search(graph, start, goal, max_depth=1000):
                         return result
         return None
 
-    # Iteratively deepening DFS
     for depth in range(max_depth):
         result = dls(start, goal, depth, [start])
         if result:
             return result
     return None
-
-def heuristic(city1, city2, coordinates):
-    lat1, lon1 = coordinates[city1]
-    lat2, lon2 = coordinates[city2]
-    return math.sqrt((lat1 - lat2)**2 + (lon1 - lon2)**2)
 
 def best_first_search(graph, start, goal, coordinates):
     open_list = []
@@ -203,6 +199,12 @@ def a_star_search(graph, start, goal, coordinates):
                     heapq.heappush(open_list, (f, new_path, g_new))
 
     return None
+
+# Heuristic Function
+def heuristic(city1, city2, coordinates):
+    lat1, lon1 = coordinates[city1]
+    lat2, lon2 = coordinates[city2]
+    return math.sqrt((lat1 - lat2)**2 + (lon1 - lon2)**2)
 
 print('------------------------------------------------------------------------------------------------------------------')
 def get_search_method():
